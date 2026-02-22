@@ -13,8 +13,12 @@
         .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
         h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.4rem; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase; }
 
+        /* Instrucciones */
+        .instruction-box { background: #1a1a1a; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #333; font-size: 0.9rem; color: #ccc; line-height: 1.5; text-align: left; }
+        .instruction-box b { color: #fff; }
+
         /* Controles de Configuración */
-        .config-box { background: #1a1a1a; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .config-box { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 24px; }
@@ -68,6 +72,12 @@
 <div class="container">
     <h1>NOETIC REG</h1>
     
+    <div class="instruction-box" id="instructions">
+        La aplicación emite aleatoriamente <b>1s y 0s</b>. <br><br>
+        Tu tarea es poner tu intención en que <b>predomine uno u otro</b>. <br><br>
+        <i>Si no pulsas detener, la sesión finalizará automáticamente a los 30 segundos.</i>
+    </div>
+
     <div class="config-box" id="config-ui">
         <span class="config-label">Mostrar indicador visual</span>
         <label class="switch">
@@ -91,11 +101,11 @@
 
     <button id="start-btn" class="btn" onclick="startExp()">INICIAR INFLUENCIA</button>
     <button id="stop-btn" class="btn btn-stop" onclick="stopExp()">DETENER</button>
-    <button id="info-btn" class="btn btn-info" onclick="openModal()">SABER MÁS SOBRE NOÉTICA</button>
+    <button id="info-btn" class="btn btn-info" onclick="openModal()">SABER MÁS SOBRE NOÉTICA / IONS</button>
 
     <div id="results-panel">
-        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary); text-align: center;">ANÁLISIS DE DATOS</h2>
-        <div class="stat-row"><span>Muestra (bits):</span> <span id="r-total">0</span></div>
+        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary); text-align: center;">SESIÓN FINALIZADA</h2>
+        <div class="stat-row"><span>Muestra total (bits):</span> <span id="r-total">0</span></div>
         <div class="stat-row"><span>Ceros (0):</span> <span id="r-0">0</span></div>
         <div class="stat-row"><span>Unos (1):</span> <span id="r-1">0</span></div>
         
@@ -103,11 +113,11 @@
             <span style="font-size: 0.75rem; color: #888;">Probabilidad de que este resultado sea debido al azar:</span>
             <span id="p-val" class="p-val-text">0.00000</span>
         </div>
-        <div id="anomaly-tag" class="anomaly">ANOMALÍA DETECTADA</div>
+        <div id="anomaly-tag" class="anomaly">¡Anomalía detectada!</div>
     </div>
 
     <div class="history-box">
-        <h3 style="font-size: 0.8rem; letter-spacing: 2px; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 5px;">ÚLTIMOS REGISTROS</h3>
+        <h3 style="font-size: 0.8rem; letter-spacing: 2px; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 5px;">HISTORIAL DE SESIONES</h3>
         <div id="history-list"></div>
     </div>
 </div>
@@ -115,23 +125,23 @@
 <div id="infoModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <h2 style="color: var(--primary); font-family: Orbitron; font-size: 1.1rem; margin-top: 0;">Ciencia Noética</h2>
+        <h2 style="color: var(--primary); font-family: Orbitron; font-size: 1.1rem; margin-top: 0;">Ciencia Noética y el IONS</h2>
         <p style="font-size: 0.85rem; color: #ccc; line-height: 1.6;">
             El <b>Instituto de Ciencias Noéticas (IONS)</b> y el Global Consciousness Project investigan la interacción mente-materia utilizando Generadores de Eventos Aleatorios (REG).
             <br><br>
-            El sistema genera bits aleatorios (0 y 1). Según la estadística, a mayor volumen de datos, el resultado tiende exactamente al 50%.
+            El sistema emite números aleatorios. Según la Ley de los Grandes Números de la estadística, a mayor volumen de datos, el resultado tiende exactamente al 50%.
             <br><br>
-            Tu objetivo es concentrarte para que prevalezca un valor. Si al detener la prueba, la probabilidad de que el resultado se deba puramente al azar (el p-valor) es <b>menor al 5% (0.05)</b>, el sistema registrará una anomalía estadística.
+            Al ejercer tu intención para desviar este comportamiento, estamos midiendo la probabilidad de que tu resultado sea pura casualidad (p-valor). Si la probabilidad es <b>menor al 5% (0.05)</b>, el sistema considera que el azar se ha roto y registra una anomalía.
             <br><br>
-            <a href="https://noetic.org/" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: bold;">🌐 Web Oficial del IONS</a>
+            <a href="https://noetic.org/" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: bold;">🌐 Visitar Web del IONS</a>
         </p>
     </div>
 </div>
 
 <script>
     let n0 = 0, n1 = 0, total = 0, startTime, engineInt, timerInt;
-    // Usamos una clave nueva para que no lea el historial corrupto del 20%
-    let historyData = JSON.parse(localStorage.getItem('noetic_history_final') || '[]');
+    // Clave nueva (v7) para reiniciar el historial y que no arrastre fallos anteriores
+    let historyData = JSON.parse(localStorage.getItem('noetic_history_v7') || '[]');
 
     function toggleIndicator() {
         const isChecked = document.getElementById('show-indicator').checked;
@@ -155,6 +165,7 @@
         document.getElementById('info-btn').style.display = "none";
         document.getElementById('config-ui').style.opacity = "0.3";
         document.getElementById('config-ui').style.pointerEvents = "none";
+        document.getElementById('instructions').style.opacity = "0.3";
         document.getElementById('stop-btn').style.display = "block";
         
         if(!document.getElementById('show-indicator').checked) {
@@ -163,10 +174,11 @@
 
         startTime = Date.now();
         
+        // Cronómetro ahora fijado a 30 segundos
         timerInt = setInterval(() => {
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
             document.getElementById('timer-display').innerText = (elapsed < 10 ? '0' : '') + elapsed + "s";
-            if(elapsed >= 60) stopExp();
+            if(elapsed >= 30) stopExp();
         }, 1000);
 
         engineInt = setInterval(() => {
@@ -193,8 +205,9 @@
         document.getElementById('stop-btn').style.display = "none";
         document.getElementById('config-ui').style.opacity = "1";
         document.getElementById('config-ui').style.pointerEvents = "auto";
+        document.getElementById('instructions').style.opacity = "1";
 
-        // Al finalizar, forzamos mostrar la gráfica para ver cómo quedó
+        // Mostrar gráfica final
         document.getElementById('live-graph').style.display = 'block';
         document.getElementById('live-pulse').style.display = 'none';
         let finalP1 = total > 0 ? (n1 / total * 100) : 50;
@@ -209,7 +222,7 @@
         const pDisplay = document.getElementById('p-val');
         pDisplay.innerText = p.toFixed(6);
 
-        // LÍMITE ESTRICTO AL 5% (0.05)
+        // Umbral estricto del 5% (0.05) para Anomalía
         if(p < 0.05) {
             document.getElementById('anomaly-tag').style.display = "block";
             pDisplay.style.color = "var(--primary)";
@@ -219,9 +232,11 @@
         }
         
         document.getElementById('results-panel').style.display = "block";
+        
         saveSession(p);
     }
 
+    // Fórmula Estadística
     function calculateP(hits, n) {
         if (n === 0) return 1;
         const mu = n * 0.5;
@@ -237,11 +252,12 @@
         return 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
     }
 
+    // Funciones del Historial
     function saveSession(p) {
         const item = { date: new Date().toLocaleTimeString(), p: p.toFixed(5) };
         historyData.unshift(item);
-        historyData = historyData.slice(0, 10);
-        localStorage.setItem('noetic_history_final', JSON.stringify(historyData));
+        historyData = historyData.slice(0, 10); // Guarda las últimas 10
+        localStorage.setItem('noetic_history_v7', JSON.stringify(historyData));
         renderHistory();
     }
 
@@ -254,6 +270,7 @@
         `).join('');
     }
 
+    // Modal
     function openModal() { document.getElementById('infoModal').style.display = "block"; }
     function closeModal() { document.getElementById('infoModal').style.display = "none"; }
     window.onclick = function(event) { if (event.target == document.getElementById('infoModal')) closeModal(); }
