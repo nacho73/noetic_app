@@ -1,4 +1,4 @@
-const CACHE_NAME = 'noetic-v1';
+const CACHE_NAME = 'noetic-v7';
 const assets = [
   './',
   './index.html',
@@ -29,4 +29,5 @@ self.addEventListener('fetch', event => {
       return response || fetch(event.request);
     })
   );
+
 });
