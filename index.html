@@ -3,172 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noetic REG | Interacción Mente-Materia</title>
+    <title>Noetic REG | Blind Experiment</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #4ecca3; --bg: #000; --surface: #111; --accent: #e94560; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; text-align: center; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
         .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
-        
-        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.4rem; margin-top: 20px; letter-spacing: 3px; }
-        
-        /* Instrucciones Neutrales */
-        .instruction-box { padding: 20px; color: #aaa; font-size: 0.9rem; line-height: 1.6; border-bottom: 1px solid #222; margin-bottom: 10px; }
-        .instruction-box b { color: #fff; }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.3rem; margin-top: 20px; letter-spacing: 2px; }
 
-        /* Gráfica de Tendencia */
-        .graph-container { background: #0a0a0a; height: 60px; border-radius: 30px; overflow: hidden; margin: 30px 0; border: 1px solid #333; position: relative; }
-        #bar-0 { background: #222; height: 100%; width: 50%; float: left; transition: width 0.3s ease; }
-        #bar-1 { background: var(--primary); height: 100%; width: 50%; float: right; transition: width 0.3s ease; }
-        .graph-mid { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: rgba(255,255,255,0.5); z-index: 5; }
+        /* Animación de oscilación neutra */
+        .pulse-container { height: 100px; display: flex; align-items: center; justify-content: center; margin: 30px 0; }
+        .dot { width: 15px; height: 15px; background: var(--primary); border-radius: 50%; margin: 0 5px; opacity: 0.3; }
+        .active .dot { animation: pulse 1.5s infinite ease-in-out; }
+        .active .dot:nth-child(2) { animation-delay: 0.2s; }
+        .active .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(2); opacity: 1; filter: blur(2px); } }
 
         /* Resultados */
-        #results-panel { display: none; background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #222; margin-top: 20px; }
-        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
-        .p-value-display { margin-top: 20px; padding: 15px; border-radius: 10px; background: #000; border: 1px dashed #444; }
-        .p-number { display: block; font-family: 'Orbitron'; font-size: 1.6rem; margin: 10px 0; }
-
-        /* Anomalía */
-        .anomaly-alert { display: none; background: var(--primary); color: #000; padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; margin-top: 15px; }
+        #results-panel { display: none; background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #222; margin-top: 20px; text-align: left; }
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; }
+        .p-box { background: #000; padding: 15px; border-radius: 10px; border: 1px dashed #444; margin-top: 15px; text-align: center; }
+        .anomaly { background: rgba(78, 204, 163, 0.2); border: 2px solid var(--primary) !important; color: var(--primary); padding: 10px; border-radius: 5px; font-weight: bold; margin-top: 10px; display: none; text-align: center; }
 
         /* Botones */
-        .btn { background: #fff; color: #000; border: none; padding: 18px; border-radius: 50px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 15px; }
-        .btn-info { background: #16213e; color: var(--primary); border: 1px solid var(--primary); margin-top: 10px; font-size: 0.8rem; }
+        .btn { background: #fff; color: #000; border: none; padding: 18px; border-radius: 50px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-stop { background: var(--accent); color: #fff; display: none; }
-        .timer { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--primary); margin: 10px 0; }
+        .btn-info { background: transparent; color: var(--primary); border: 1px solid var(--primary); font-size: 0.8rem; }
+
+        /* Historial */
+        .history-box { margin-top: 30px; text-align: left; font-size: 0.8rem; color: #888; }
+        .h-item { padding: 5px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
 
         /* Modal */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
-        .modal-content { background: #16213e; margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; text-align: left; border: 1px solid var(--primary); }
-        .close-btn { color: var(--accent); float: right; font-size: 28px; cursor: pointer; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
+        .modal-content { background: #111; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: left; border: 1px solid #333; line-height: 1.6; }
+        .close { color: var(--accent); float: right; font-size: 30px; cursor: pointer; }
+        a { color: var(--primary); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>NOETIC REG</h1>
+    <h1>NOETIC REG PRO</h1>
     
-    <div class="instruction-box">
-        El sistema emite aleatoriamente <b>unos</b> y <b>ceros</b>. 
-        Concéntrate para que uno prevalezca. Mantén tu intención firme.
+    <p style="color: #666; font-size: 0.85rem; margin-top: 10px;">
+        Enfoque ciego: El sistema genera bits en silencio. <br>
+        Concentra tu intención sin distracciones visuales.
+    </p>
+
+    <div id="pulse" class="pulse-container">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
 
-    <div class="timer" id="timer-display">00s</div>
+    <div id="timer" style="font-family: Orbitron; color: var(--primary);">00s</div>
 
-    <div class="graph-container">
-        <div class="graph-mid"></div>
-        <div id="bar-0"></div>
-        <div id="bar-1"></div>
-    </div>
-
-    <button id="btn-start" class="btn" onclick="startExperiment()">INICIAR INFLUENCIA</button>
-    <button id="btn-stop" class="btn btn-stop" onclick="stopExperiment()">DETENER</button>
-    <button class="btn btn-info" onclick="openModal()">SABER MÁS / IONS</button>
+    <button id="start-btn" class="btn" onclick="startExp()">INICIAR INFLUENCIA</button>
+    <button id="stop-btn" class="btn btn-stop" onclick="stopExp()">DETENER</button>
+    <button class="btn btn-info" onclick="openModal()">SABER MÁS SOBRE NOÉTICA</button>
 
     <div id="results-panel">
-        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary);">SESIÓN FINALIZADA</h2>
-        <div class="stat-row"><span>Bits totales:</span> <span id="res-total">0</span></div>
-        <div class="stat-row"><span>Ceros (0):</span> <span id="res-0">0</span></div>
-        <div class="stat-row"><span>Unos (1):</span> <span id="res-1">0</span></div>
+        <h2 style="font-family: Orbitron; font-size: 0.9rem; color: var(--primary);">ANÁLISIS DE DATOS</h2>
+        <div class="stat-row"><span>Muestra (bits):</span> <span id="r-total">0</span></div>
+        <div class="stat-row"><span>Ceros (0):</span> <span id="r-0">0</span></div>
+        <div class="stat-row"><span>Unos (1):</span> <span id="r-1">0</span></div>
         
-        <div class="p-value-display">
-            <span style="font-size: 0.8rem; color: #888;">Probabilidad de que este resultado sea debido al azar:</span>
-            <span id="p-val" class="p-number">--</span>
-            <div id="anomaly-tag" class="anomaly-alert">¡ANOMALÍA DETECTADA!</div>
+        <div class="p-box">
+            <small style="color:#777">Probabilidad de azar:</small><br>
+            <span id="p-val" style="font-family: Orbitron; font-size: 1.5rem;">0.0000</span>
         </div>
+        <div id="anomaly-tag" class="anomaly">ANOMALÍA DETECTADA</div>
+    </div>
+
+    <div class="history-box">
+        <h3 style="font-size: 0.7rem; letter-spacing: 2px;">ÚLTIMOS REGISTROS</h3>
+        <div id="history-list"></div>
     </div>
 </div>
 
 <div id="infoModal" class="modal">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 style="font-family: Orbitron; color: var(--primary); margin-bottom: 15px;">Estudios Noéticos</h2>
-        <p style="font-size: 0.9rem; line-height: 1.6; color: #ccc;">
-            El <b>Global Consciousness Project</b> y el <b>IONS</b> (Institute of Noetic Sciences) utilizan Generadores de Eventos Aleatorios (REG) para investigar la interacción entre la conciencia y el mundo físico.
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 style="color: var(--primary); font-family: Orbitron; font-size: 1rem;">Ciencia Noética</h2>
+        <p style="font-size: 0.85rem; color: #ccc;">
+            Los experimentos REG (Generador de Eventos Aleatorios) exploran si la conciencia humana puede influir en sistemas físicos azarosos. 
             <br><br>
-            <b>Protocolo:</b> La "Ley de los Grandes Números" dicta que en un sistema binario equilibrado, los resultados tienden al 50%. Desviaciones estadísticamente significativas (p < 0.05) sugieren que la intención humana puede actuar reduciendo la entropía del sistema.
+            Esta metodología fue popularizada por el <b>Instituto de Ciencias Noéticas (IONS)</b> y el Global Consciousness Project. 
             <br><br>
-            <i style="font-size: 0.75rem; color: #777;">Aviso: Esta app es una herramienta de experimentación personal inspirada en estos protocolos. No existe vínculo oficial con el IONS.</i>
+            <b>Ley de Grandes Números:</b> En una muestra grande, el azar debe dar un 50/50. Si tu p-valor es bajo, has "ordenado" el caos.
+            <br><br>
+            <a href="https://noetic.org/" target="_blank">🌐 Web Oficial del IONS</a>
         </p>
     </div>
 </div>
 
 <script>
-    let n0 = 0, n1 = 0, total = 0, startTime, timerInt, engineInt;
+    let n0 = 0, n1 = 0, total = 0, startTime, engine, timer;
+    let history = JSON.parse(localStorage.getItem('noetic_history_v3') || '[]');
 
-    function startExperiment() {
+    function startExp() {
         n0 = 0; n1 = 0; total = 0;
         document.getElementById('results-panel').style.display = "none";
-        document.getElementById('anomaly-tag').style.display = "none";
-        document.getElementById('btn-start').style.display = "none";
-        document.getElementById('btn-stop').style.display = "block";
+        document.getElementById('pulse').classList.add('active');
+        document.getElementById('start-btn').style.display = "none";
+        document.getElementById('stop-btn').style.display = "block";
 
         startTime = Date.now();
-        timerInt = setInterval(() => {
+        timer = setInterval(() => {
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timer-display').innerText = (elapsed < 10 ? '0' : '') + elapsed + "s";
-            if(elapsed >= 60) stopExperiment(); 
+            document.getElementById('timer').innerText = (elapsed < 10 ? '0' : '') + elapsed + "s";
+            if(elapsed >= 60) stopExp();
         }, 1000);
 
-        engineInt = setInterval(() => {
+        engine = setInterval(() => {
             for(let i=0; i<100; i++) {
                 if(Math.random() > 0.5) n1++; else n0++;
                 total++;
             }
-            let p1 = (n1 / total * 100);
-            document.getElementById('bar-0').style.width = (100 - p1) + "%";
-            document.getElementById('bar-1').style.width = p1 + "%";
         }, 100);
     }
 
-    function stopExperiment() {
-        clearInterval(timerInt);
-        clearInterval(engineInt);
-        document.getElementById('btn-start').style.display = "block";
-        document.getElementById('btn-stop').style.display = "none";
-
-        document.getElementById('res-total').innerText = total;
-        document.getElementById('res-0').innerText = n0;
-        document.getElementById('res-1').innerText = n1;
+    function stopExp() {
+        clearInterval(engine); clearInterval(timer);
+        document.getElementById('pulse').classList.remove('active');
+        document.getElementById('start-btn').style.display = "block";
+        document.getElementById('stop-btn').style.display = "none";
 
         const p = calculateP(n1, total);
-        const pDisplay = document.getElementById('p-val');
-        
-        // CORRECCIÓN: Asegurar que p no exceda 1
-        const finalP = p > 1 ? 1 : p;
-        pDisplay.innerText = finalP.toFixed(6);
-
-        if(finalP < 0.05) {
-            document.getElementById('anomaly-tag').style.display = "block";
-            pDisplay.style.color = "var(--primary)";
-        } else {
-            pDisplay.style.color = "#fff";
-        }
-        document.getElementById('results-panel').style.display = "block";
+        showResults(p);
+        saveSession(p);
     }
 
     function calculateP(hits, n) {
         if (n === 0) return 1;
         const mu = n * 0.5;
-        const sd = Math.sqrt(n * 0.5 * 0.5);
+        const sd = Math.sqrt(n * 0.25);
         const z = Math.abs(hits - mu) / sd;
-        // Fórmula de aproximación para la distribución normal (p-valor de dos colas)
         const p = 2 * (1 - normalCDF(z));
-        return p;
+        return p > 1 ? 1 : p;
     }
 
     function normalCDF(z) {
         const t = 1 / (1 + 0.2316419 * z);
         const d = 0.3989423 * Math.exp(-z * z / 2);
-        const prob = 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
-        return prob;
+        return 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+    }
+
+    function showResults(p) {
+        document.getElementById('r-total').innerText = total;
+        document.getElementById('r-0').innerText = n0;
+        document.getElementById('r-1').innerText = n1;
+        document.getElementById('p-val').innerText = p.toFixed(4);
+        
+        const tag = document.getElementById('anomaly-tag');
+        if(p < 0.20) {
+            tag.style.display = "block";
+            document.getElementById('p-val').style.color = "var(--primary)";
+        } else {
+            tag.style.display = "none";
+            document.getElementById('p-val').style.color = "#fff";
+        }
+        document.getElementById('results-panel').style.display = "block";
+    }
+
+    function saveSession(p) {
+        const item = { date: new Date().toLocaleTimeString(), p: p.toFixed(4) };
+        history.unshift(item);
+        history = history.slice(0, 10);
+        localStorage.setItem('noetic_history_v3', JSON.stringify(history));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        document.getElementById('history-list').innerHTML = history.map(h => `
+            <div class="h-item">
+                <span>${h.date}</span>
+                <span style="color:${h.p < 0.20 ? '#4ecca3' : '#666'}">p = ${h.p}</span>
+            </div>
+        `).join('');
     }
 
     function openModal() { document.getElementById('infoModal').style.display = "block"; }
     function closeModal() { document.getElementById('infoModal').style.display = "none"; }
-    window.onclick = function(event) { if (event.target == document.getElementById('infoModal')) closeModal(); }
+    window.onload = renderHistory;
 </script>
 </body>
 </html>
