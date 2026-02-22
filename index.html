@@ -3,155 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noetic REG Pro | Visualizador en Vivo</title>
+    <title>Noetic REG | Interacción Mente-Materia</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a2e">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4ecca3; --bg: #1a1a2e; --surface: #16213e; --accent: #e94560; --gray: #444; }
+        :root { --primary: #4ecca3; --bg: #000; --surface: #111; --accent: #e94560; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; text-align: center; }
         .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
-        .card { background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #0f3460; margin-bottom: 20px; }
-        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
         
-        /* Instrucciones claras */
-        .instruction-box { background: #0a1128; padding: 15px; border-radius: 12px; border: 1px solid var(--primary); margin-bottom: 20px; }
-        .instruction-box b { color: var(--accent); font-size: 1.1rem; }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.4rem; margin-top: 20px; letter-spacing: 3px; }
+        
+        /* Instrucciones Neutrales */
+        .instruction-box { padding: 20px; color: #aaa; font-size: 0.9rem; line-height: 1.6; }
+        .instruction-box b { color: #fff; }
 
-        /* Gráfica en vivo */
-        .graph-container { background: #000; height: 40px; border-radius: 20px; overflow: hidden; margin: 20px 0; border: 2px solid #333; position: relative; }
-        #bar-0 { background: #333; height: 100%; width: 50%; float: left; transition: width 0.1s linear; }
-        #bar-1 { background: var(--primary); height: 100%; width: 50%; float: right; transition: width 0.1s linear; }
-        .graph-mid { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: #fff; z-index: 5; }
+        /* Gráfica de Tendencia Principal */
+        .graph-container { background: #0a0a0a; height: 60px; border-radius: 30px; overflow: hidden; margin: 30px 0; border: 1px solid #333; position: relative; box-shadow: 0 0 20px rgba(0,0,0,1); }
+        #bar-0 { background: #222; height: 100%; width: 50%; float: left; transition: width 0.3s ease; }
+        #bar-1 { background: var(--primary); height: 100%; width: 50%; float: right; transition: width 0.3s ease; }
+        .graph-mid { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: rgba(255,255,255,0.5); z-index: 5; }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: #0a1128; padding: 10px; border-radius: 10px; border: 1px solid #1a2a4a; }
-        .stat-val { font-family: 'Orbitron'; font-size: 1.4rem; color: #fff; display: block; }
-        .stat-label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; }
+        /* Pantalla de Resultados (Oculta durante el proceso) */
+        #results-panel { display: none; background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #222; margin-top: 20px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
+        .p-value-display { margin-top: 20px; padding: 15px; border-radius: 10px; background: #000; border: 1px dashed #444; }
+        .p-number { display: block; font-family: 'Orbitron'; font-size: 1.8rem; margin: 10px 0; }
 
-        .btn { background: var(--primary); color: #1a1a2e; border: none; padding: 18px; border-radius: 15px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
+        /* Letrero de Anomalía */
+        .anomaly-alert { display: none; background: var(--primary); color: #000; padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; margin-top: 15px; text-transform: uppercase; }
+
+        /* Controles */
+        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 50px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 20px; }
         .btn-stop { background: var(--accent); color: #fff; display: none; }
-        
-        #p-res { min-height: 40px; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; font-size: 0.9rem; }
-        .sig { background: rgba(78, 204, 163, 0.2); border: 1px solid var(--primary); color: var(--primary); }
+        .timer { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--primary); margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>REG EXPERIMENTER</h1>
-        <p style="font-size: 0.6rem; color: #888; letter-spacing: 2px;">PSICOCINESIS APLICADA</p>
-    </header>
-
-    <div class="instruction-box">
-        <p><b>OBJETIVO MENTAL:</b></p>
-        <p style="font-size: 0.9rem; margin-top: 5px;">Concéntrate intensamente en que el emisor genere más <b>"UNOS" (Barra Verde)</b> o más <b>"CEROS" (Barra Gris)</b>.</p>
+    <h1>NOETIC REG</h1>
+    
+    <div id="setup-view">
+        <div class="instruction-box">
+            El sistema emite aleatoriamente <b>unos</b> y <b>ceros</b>. <br><br>
+            Tu tarea es concentrarte para que uno de ellos prevalezca sobre el otro. 
+            Observa la barra de tendencia y mantén tu intención firme.
+        </div>
     </div>
 
-    <div class="card">
-        <div class="stats-grid">
-            <div class="stat-card"><span class="stat-label">Ceros (0s)</span><span id="c-0" class="stat-val">0</span></div>
-            <div class="stat-card"><span class="stat-label">Unos (1s)</span><span id="c-1" class="stat-val">0</span></div>
-            <div class="stat-card"><span class="stat-label">Total Bits (n)</span><span id="c-total" class="stat-val">0</span></div>
-            <div class="stat-card"><span class="stat-label">Cronómetro</span><span id="c-time" class="stat-val">0s</span></div>
-        </div>
+    <div class="timer" id="timer-display">00s</div>
 
-        <div class="graph-container">
-            <div class="graph-mid"></div>
-            <div id="bar-0"></div>
-            <div id="bar-1"></div>
-        </div>
-
-        <button id="btn-start" class="btn" onclick="startEngine()">INICIAR EMISIÓN</button>
-        <button id="btn-stop" class="btn btn-stop" onclick="stopEngine()">DETENER INFLUENCIA</button>
-
-        <div id="p-res">Esperando inicio...</div>
+    <div class="graph-container">
+        <div class="graph-mid"></div>
+        <div id="bar-0"></div>
+        <div id="bar-1"></div>
     </div>
 
-    <p style="font-size: 0.7rem; color: #555; padding: 10px;">Basado en la Ley de los Grandes Números y la Distribución Binomial. La influencia se mide por la desviación del 50% teórico.</p>
+    <button id="btn-start" class="btn" onclick="startExperiment()">INICIAR INFLUENCIA</button>
+    <button id="btn-stop" class="btn btn-stop" onclick="stopExperiment()">DETENER</button>
+
+    <div id="results-panel">
+        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary);">RESULTADOS DE LA SESIÓN</h2>
+        <div class="stat-row"><span>Total bits emitidos:</span> <span id="res-total">0</span></div>
+        <div class="stat-row"><span>Distribución Ceros (0):</span> <span id="res-0">0</span></div>
+        <div class="stat-row"><span>Distribución Unos (1):</span> <span id="res-1">0</span></div>
+        
+        <div class="p-value-display">
+            <span style="font-size: 0.8rem; color: #888;">Probabilidad de que este resultado sea debido al azar:</span>
+            <span id="p-val" class="p-number">0.5000</span>
+            <div id="anomaly-tag" class="anomaly-alert">¡ANOMALÍA DETECTADA!</div>
+        </div>
+    </div>
 </div>
 
 <script>
-    let n0 = 0, n1 = 0, nTotal = 0, startTime, timerInterval, engineInterval;
+    let n0 = 0, n1 = 0, total = 0, startTime, timerInt, engineInt;
 
-    function startEngine() {
+    function startExperiment() {
         // Reset
-        n0 = 0; n1 = 0; nTotal = 0;
-        document.getElementById('c-0').innerText = "0";
-        document.getElementById('c-1').innerText = "0";
-        document.getElementById('c-total').innerText = "0";
-        document.getElementById('c-time').innerText = "0s";
-        document.getElementById('p-res').innerText = "Influencia en curso...";
-        document.getElementById('p-res').className = "";
-
+        n0 = 0; n1 = 0; total = 0;
+        document.getElementById('results-panel').style.display = "none";
+        document.getElementById('anomaly-tag').style.display = "none";
+        document.getElementById('setup-view').style.opacity = "0.3";
+        
         // UI
         document.getElementById('btn-start').style.display = "none";
         document.getElementById('btn-stop').style.display = "block";
 
         startTime = Date.now();
         
-        // Cronómetro
-        timerInterval = setInterval(() => {
+        timerInt = setInterval(() => {
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('c-time').innerText = elapsed + "s";
-            if(elapsed >= 60) stopEngine(); // Auto-parada por fatiga mental
+            document.getElementById('timer-display').innerText = (elapsed < 10 ? '0' : '') + elapsed + "s";
+            if(elapsed >= 60) stopExperiment(); 
         }, 1000);
 
-        // Emisor de Bits (Genera 100 bits cada 100ms para ver fluidez)
-        engineInterval = setInterval(() => {
-            for(let i=0; i<50; i++) {
+        // Emisor de bits constante
+        engineInt = setInterval(() => {
+            for(let i=0; i<100; i++) {
                 if(Math.random() > 0.5) n1++; else n0++;
-                nTotal++;
+                total++;
             }
-            updateView();
+            // Actualizar gráfica en vivo (pero no los números)
+            let p1 = (n1 / total * 100);
+            let p0 = 100 - p1;
+            document.getElementById('bar-0').style.width = p0 + "%";
+            document.getElementById('bar-1').style.width = p1 + "%";
         }, 100);
     }
 
-    function updateView() {
-        document.getElementById('c-0').innerText = n0;
-        document.getElementById('c-1').innerText = n1;
-        document.getElementById('c-total').innerText = nTotal;
-        
-        let p0 = (n0 / nTotal * 100).toFixed(1);
-        let p1 = (n1 / nTotal * 100).toFixed(1);
-        
-        document.getElementById('bar-0').style.width = p0 + "%";
-        document.getElementById('bar-1').style.width = p1 + "%";
-    }
-
-    function stopEngine() {
-        clearInterval(timerInterval);
-        clearInterval(engineInterval);
+    function stopExperiment() {
+        clearInterval(timerInt);
+        clearInterval(engineInt);
 
         document.getElementById('btn-start').style.display = "block";
         document.getElementById('btn-stop').style.display = "none";
+        document.getElementById('setup-view').style.opacity = "1";
 
-        const pValue = calculateP(n1, nTotal);
-        const resultBox = document.getElementById('p-res');
-        
-        let text = `Probabilidad azar (p): ${pValue.toFixed(4)}`;
-        if(pValue < 0.05) {
-            resultBox.className = "sig";
-            text += " - ¡ANOMALÍA DETECTADA!";
+        // Mostrar resultados numéricos solo al final
+        document.getElementById('res-total').innerText = total;
+        document.getElementById('res-0').innerText = n0;
+        document.getElementById('res-1').innerText = n1;
+
+        const p = calculateP(n1, total);
+        const pDisplay = document.getElementById('p-val');
+        pDisplay.innerText = p.toFixed(6);
+
+        if(p < 0.05) {
+            document.getElementById('anomaly-tag').style.display = "block";
+            pDisplay.style.color = "var(--primary)";
         } else {
-            resultBox.className = "";
-            text += " - Resultado dentro del azar.";
+            pDisplay.style.color = "#fff";
         }
-        resultBox.innerText = text;
+
+        document.getElementById('results-panel').style.display = "block";
     }
 
-    // Estadística: Distribución Binomial aproximada por Z-Score
     function calculateP(hits, n) {
-        if (n < 10) return 1;
-        let expected = n * 0.5;
-        let sd = Math.sqrt(n * 0.5 * 0.5);
-        let z = Math.abs(hits - expected) / sd;
-        return 2 * (1 - errorFunction(z / Math.sqrt(2)));
+        if (n === 0) return 1;
+        const mu = n * 0.5;
+        const sd = Math.sqrt(n * 0.5 * 0.5);
+        const z = Math.abs(hits - mu) / sd;
+        return 2 * (1 - errorFunc(z / Math.sqrt(2)));
     }
 
-    function errorFunction(x) {
+    function errorFunc(x) {
         let t = 1.0 / (1.0 + 0.5 * Math.abs(x));
         let tau = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
         return x >= 0 ? 1 - tau : tau - 1;
