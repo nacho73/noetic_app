@@ -11,7 +11,7 @@
         :root { --primary: #4ecca3; --bg: #000; --surface: #111; --accent: #e94560; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; text-align: center; }
         .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
-        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.4rem; margin-top: 15px; letter-spacing: 2px; }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.4rem; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase; }
 
         /* Controles de Configuración */
         .config-box { background: #1a1a1a; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -23,24 +23,23 @@
         input:checked + .slider:before { transform: translateX(26px); }
         .config-label { font-size: 0.85rem; color: #ccc; font-family: 'Orbitron'; }
 
-        /* Indicador en vivo (Barra) */
-        .graph-container { background: #0a0a0a; height: 50px; border-radius: 25px; overflow: hidden; margin: 20px 0; border: 1px solid #333; position: relative; display: none; }
+        /* Indicadores (Barra y Pulso) */
+        .indicator-wrapper { height: 60px; margin: 20px 0; display: flex; align-items: center; justify-content: center; }
+        
+        .graph-container { background: #0a0a0a; height: 50px; border-radius: 25px; overflow: hidden; width: 100%; border: 1px solid #333; position: relative; display: block; }
         #bar-0 { background: #222; height: 100%; width: 50%; float: left; transition: width 0.1s linear; }
         #bar-1 { background: var(--primary); height: 100%; width: 50%; float: right; transition: width 0.1s linear; }
         .graph-mid { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: rgba(255,255,255,0.5); z-index: 5; }
 
-        /* Modo Ciego (Pulso) */
-        .pulse-container { height: 50px; display: none; align-items: center; justify-content: center; margin: 20px 0; }
+        .pulse-container { display: none; align-items: center; justify-content: center; width: 100%; }
         .dot { width: 12px; height: 12px; background: var(--primary); border-radius: 50%; margin: 0 5px; opacity: 0.3; }
         .active-pulse .dot { animation: pulse 1s infinite ease-in-out; }
         .active-pulse .dot:nth-child(2) { animation-delay: 0.2s; }
         .active-pulse .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.5); opacity: 1; filter: blur(1px); } }
 
-        /* Cronómetro */
+        /* Cronómetro y Botones */
         .timer { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--primary); margin: 15px 0; }
-
-        /* Botones */
         .btn { background: #fff; color: #000; border: none; padding: 18px; border-radius: 50px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         .btn-stop { background: var(--accent); color: #fff; display: none; }
         .btn-info { background: transparent; color: var(--primary); border: 1px solid var(--primary); font-size: 0.8rem; }
@@ -50,7 +49,13 @@
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
         .p-box { background: #000; padding: 15px; border-radius: 10px; border: 1px dashed #444; margin-top: 15px; text-align: center; }
         .p-val-text { font-family: 'Orbitron'; font-size: 1.8rem; display: block; margin-top: 5px; }
+        
+        /* Anomalía */
         .anomaly { background: rgba(78, 204, 163, 0.15); border: 2px solid var(--primary); color: var(--primary); padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 15px; text-align: center; font-family: 'Orbitron'; display: none; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Historial */
+        .history-box { margin-top: 30px; text-align: left; font-size: 0.85rem; color: #888; }
+        .h-item { padding: 8px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
@@ -66,30 +71,31 @@
     <div class="config-box" id="config-ui">
         <span class="config-label">Mostrar indicador visual</span>
         <label class="switch">
-            <input type="checkbox" id="show-indicator" checked>
+            <input type="checkbox" id="show-indicator" checked onchange="toggleIndicator()">
             <span class="slider"></span>
         </label>
     </div>
 
     <div class="timer" id="timer-display">00s</div>
 
-    <div class="graph-container" id="live-graph">
-        <div class="graph-mid"></div>
-        <div id="bar-0"></div>
-        <div id="bar-1"></div>
-    </div>
-
-    <div class="pulse-container" id="live-pulse">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="indicator-wrapper">
+        <div class="graph-container" id="live-graph">
+            <div class="graph-mid"></div>
+            <div id="bar-0"></div>
+            <div id="bar-1"></div>
+        </div>
+        <div class="pulse-container" id="live-pulse">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
     </div>
 
     <button id="start-btn" class="btn" onclick="startExp()">INICIAR INFLUENCIA</button>
-    <button id="stop-btn" class="btn btn-stop" onclick="stopExp()">DETENER (O 60s)</button>
-    <button id="info-btn" class="btn btn-info" onclick="openModal()">SABER MÁS SOBRE NOÉTICA / IONS</button>
+    <button id="stop-btn" class="btn btn-stop" onclick="stopExp()">DETENER</button>
+    <button id="info-btn" class="btn btn-info" onclick="openModal()">SABER MÁS SOBRE NOÉTICA</button>
 
     <div id="results-panel">
-        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary); text-align: center;">SESIÓN FINALIZADA</h2>
-        <div class="stat-row"><span>Muestra total (bits):</span> <span id="r-total">0</span></div>
+        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary); text-align: center;">ANÁLISIS DE DATOS</h2>
+        <div class="stat-row"><span>Muestra (bits):</span> <span id="r-total">0</span></div>
         <div class="stat-row"><span>Ceros (0):</span> <span id="r-0">0</span></div>
         <div class="stat-row"><span>Unos (1):</span> <span id="r-1">0</span></div>
         
@@ -97,7 +103,12 @@
             <span style="font-size: 0.75rem; color: #888;">Probabilidad de que este resultado sea debido al azar:</span>
             <span id="p-val" class="p-val-text">0.00000</span>
         </div>
-        <div id="anomaly-tag" class="anomaly">¡Anomalía detectada!</div>
+        <div id="anomaly-tag" class="anomaly">ANOMALÍA DETECTADA</div>
+    </div>
+
+    <div class="history-box">
+        <h3 style="font-size: 0.8rem; letter-spacing: 2px; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 5px;">ÚLTIMOS REGISTROS</h3>
+        <div id="history-list"></div>
     </div>
 </div>
 
@@ -112,35 +123,32 @@
             <br><br>
             Tu objetivo es concentrarte para que prevalezca un valor. Si al detener la prueba, la probabilidad de que el resultado se deba puramente al azar (el p-valor) es <b>menor al 5% (0.05)</b>, el sistema registrará una anomalía estadística.
             <br><br>
-            <a href="https://noetic.org/" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: bold;">🌐 Visitar Web del IONS</a>
+            <a href="https://noetic.org/" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: bold;">🌐 Web Oficial del IONS</a>
         </p>
     </div>
 </div>
 
 <script>
     let n0 = 0, n1 = 0, total = 0, startTime, engineInt, timerInt;
+    // Usamos una clave nueva para que no lea el historial corrupto del 20%
+    let historyData = JSON.parse(localStorage.getItem('noetic_history_final') || '[]');
 
-    // Configuración inicial de las vistas
-    document.getElementById('live-graph').style.display = 'block';
-
-    document.getElementById('show-indicator').addEventListener('change', function() {
-        if(this.checked) {
+    function toggleIndicator() {
+        const isChecked = document.getElementById('show-indicator').checked;
+        if(isChecked) {
             document.getElementById('live-graph').style.display = 'block';
             document.getElementById('live-pulse').style.display = 'none';
-            document.getElementById('live-pulse').classList.remove('active-pulse');
         } else {
             document.getElementById('live-graph').style.display = 'none';
             document.getElementById('live-pulse').style.display = 'flex';
         }
-    });
+    }
 
     function startExp() {
-        // Reiniciar variables
         n0 = 0; n1 = 0; total = 0;
         document.getElementById('bar-0').style.width = "50%";
         document.getElementById('bar-1').style.width = "50%";
         
-        // Cambios de UI
         document.getElementById('results-panel').style.display = "none";
         document.getElementById('anomaly-tag').style.display = "none";
         document.getElementById('start-btn').style.display = "none";
@@ -149,28 +157,24 @@
         document.getElementById('config-ui').style.pointerEvents = "none";
         document.getElementById('stop-btn').style.display = "block";
         
-        // Activar pulso si el modo ciego está activo
         if(!document.getElementById('show-indicator').checked) {
             document.getElementById('live-pulse').classList.add('active-pulse');
         }
 
         startTime = Date.now();
         
-        // Cronómetro y límite de 60s
         timerInt = setInterval(() => {
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
             document.getElementById('timer-display').innerText = (elapsed < 10 ? '0' : '') + elapsed + "s";
             if(elapsed >= 60) stopExp();
         }, 1000);
 
-        // Generador de alta velocidad
         engineInt = setInterval(() => {
             for(let i=0; i<100; i++) {
                 if(Math.random() > 0.5) n1++; else n0++;
                 total++;
             }
             
-            // Actualizar gráfica en vivo si está visible
             if(document.getElementById('show-indicator').checked) {
                 let p1 = (n1 / total * 100);
                 document.getElementById('bar-0').style.width = (100 - p1) + "%";
@@ -183,7 +187,6 @@
         clearInterval(engineInt); 
         clearInterval(timerInt);
         
-        // Restaurar UI
         document.getElementById('live-pulse').classList.remove('active-pulse');
         document.getElementById('start-btn').style.display = "block";
         document.getElementById('info-btn').style.display = "block";
@@ -191,14 +194,13 @@
         document.getElementById('config-ui').style.opacity = "1";
         document.getElementById('config-ui').style.pointerEvents = "auto";
 
-        // Asegurar que la gráfica muestre el resultado final aunque estuviera oculta
+        // Al finalizar, forzamos mostrar la gráfica para ver cómo quedó
         document.getElementById('live-graph').style.display = 'block';
         document.getElementById('live-pulse').style.display = 'none';
         let finalP1 = total > 0 ? (n1 / total * 100) : 50;
         document.getElementById('bar-0').style.width = (100 - finalP1) + "%";
         document.getElementById('bar-1').style.width = finalP1 + "%";
 
-        // Cálculos numéricos
         document.getElementById('r-total').innerText = total;
         document.getElementById('r-0').innerText = n0;
         document.getElementById('r-1').innerText = n1;
@@ -207,7 +209,7 @@
         const pDisplay = document.getElementById('p-val');
         pDisplay.innerText = p.toFixed(6);
 
-        // Umbral exacto del 5% (0.05)
+        // LÍMITE ESTRICTO AL 5% (0.05)
         if(p < 0.05) {
             document.getElementById('anomaly-tag').style.display = "block";
             pDisplay.style.color = "var(--primary)";
@@ -217,15 +219,14 @@
         }
         
         document.getElementById('results-panel').style.display = "block";
+        saveSession(p);
     }
 
-    // Fórmula Estadística (Distribución Binomial a Normal)
     function calculateP(hits, n) {
         if (n === 0) return 1;
         const mu = n * 0.5;
         const sd = Math.sqrt(n * 0.25);
         const z = Math.abs(hits - mu) / sd;
-        // 2 colas
         const p = 2 * (1 - normalCDF(z));
         return p > 1 ? 1 : p;
     }
@@ -236,10 +237,31 @@
         return 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
     }
 
-    // Modal
+    function saveSession(p) {
+        const item = { date: new Date().toLocaleTimeString(), p: p.toFixed(5) };
+        historyData.unshift(item);
+        historyData = historyData.slice(0, 10);
+        localStorage.setItem('noetic_history_final', JSON.stringify(historyData));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        document.getElementById('history-list').innerHTML = historyData.map(h => `
+            <div class="h-item">
+                <span>${h.date}</span>
+                <span style="color:${h.p < 0.05 ? '#4ecca3' : '#666'}; font-weight: ${h.p < 0.05 ? 'bold' : 'normal'};">p = ${h.p}</span>
+            </div>
+        `).join('');
+    }
+
     function openModal() { document.getElementById('infoModal').style.display = "block"; }
     function closeModal() { document.getElementById('infoModal').style.display = "none"; }
     window.onclick = function(event) { if (event.target == document.getElementById('infoModal')) closeModal(); }
+
+    window.onload = function() {
+        toggleIndicator();
+        renderHistory();
+    };
 </script>
 </body>
 </html>
