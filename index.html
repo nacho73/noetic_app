@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noetic REG | Mente-Materia</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --primary: #4ecca3; --bg: #1a1a2e; --surface: #16213e; --accent: #e94560; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
+        
+        .card { background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #0f3460; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        h1, h2 { font-family: 'Orbitron', sans-serif; color: var(--primary); text-align: center; margin-bottom: 10px; }
+        
+        .display { display: flex; justify-content: space-around; align-items: center; margin: 25px 0; background: #0f3460; padding: 20px; border-radius: 15px; }
+        .val { font-family: 'Orbitron'; font-size: 2rem; color: #fff; display: block; }
+        .label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; }
+
+        .btn { background: var(--accent); color: #fff; border: none; padding: 18px; border-radius: 15px; width: 100%; font-family: 'Orbitron'; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0 #9d2d41; margin-bottom: 10px; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #9d2d41; }
+        
+        .p-box { text-align: center; margin-top: 15px; padding: 10px; border-radius: 10px; font-weight: bold; background: #0a1128; border: 1px dashed #4ecca3; min-height: 45px; }
+        .sig { background: rgba(78, 204, 163, 0.3); color: #fff; border: 2px solid var(--primary); animation: glow 1.5s infinite alternate; }
+
+        @keyframes glow { from { box-shadow: 0 0 5px var(--primary); } to { box-shadow: 0 0 20px var(--primary); } }
+
+        .info { font-size: 0.85rem; color: #aaa; line-height: 1.5; margin-top: 10px; }
+        .info b { color: var(--primary); }
+
+        .history-list { margin-top: 10px; font-size: 0.8rem; }
+        .h-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #0f3460; }
+
+        /* Estilos para el Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); overflow-y: auto; }
+        .modal-content { background: var(--surface); margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid var(--primary); }
+        .close-btn { color: var(--accent); float: right; font-size: 28px; cursor: pointer; font-family: 'Orbitron'; }
+        .disclaimer { font-size: 0.7rem; color: #777; margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header style="margin-bottom: 30px;">
+        <h1>NOETIC REG</h1>
+        <p style="text-align:center; font-size:0.7rem; color:var(--primary); letter-spacing:2px;">EXPERIMENTACIÓN CUÁNTICA MENTAL</p>
+    </header>
+
+    <div class="card">
+        <h2>Intención Directa</h2>
+        <p class="info">Concéntrate. Tu objetivo es desviar la probabilidad. El sistema lanzará <b>200 bits</b> aleatorios.</p>
+        
+        <div class="display">
+            <div style="text-align:center;"><span class="label">Aciertos</span><span id="hits" class="val">0</span></div>
+            <div style="text-align:center;"><span class="label">Desviación</span><span id="dev" class="val">0%</span></div>
+        </div>
+
+        <button class="btn" onclick="runExp()">INICIAR INFLUENCIA</button>
+        <button class="btn" style="background:#0f3460; font-size:0.8rem;" onclick="openModal()">Saber más sobre Noética</button>
+        
+        <div id="p-res" class="p-box">Probabilidad p: --</div>
+    </div>
+
+    <div class="card">
+        <h3>Tu Historial</h3>
+        <div id="history" class="history-list"></div>
+    </div>
+</div>
+
+<div id="infoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>Experimentos IONS</h2>
+        <p class="info">El <b>Global Consciousness Project</b> y el IONS utilizan Generadores de Eventos Aleatorios (REG) para medir la "entropía". Han observado que en eventos que unen emocionalmente a millones de personas, el azar deja de ser tan azaroso.</p>
+        <br>
+        <p class="info">Esta app simula ese entorno. Tu intención intenta "ordenar" los bits generados por el procesador de tu móvil. No es solo un juego, es una práctica de enfoque mental profundo.</p>
+        
+        <div class="disclaimer">
+            Esta aplicación es una herramienta de experimentación personal inspirada en los protocolos de instituciones científicas. No existe vínculo oficial con el Institute of Noetic Sciences (IONS), simplemente nos inspiramos en su metodología.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Registro del Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW no registrado', err));
+        });
+    }
+
+    let sessions = JSON.parse(localStorage.getItem('noetic_sessions') || '[]');
+
+    function runExp() {
+        let hits = 0;
+        const n = 200; 
+        for(let i=0; i<n; i++) { if(Math.random() > 0.5) hits++; }
+
+        const deviation = ((hits - (n/2)) / (n/2) * 100).toFixed(1);
+        const p = calculateP(hits, n);
+
+        document.getElementById('hits').innerText = hits;
+        document.getElementById('dev').innerText = (deviation > 0 ? '+'+deviation : deviation) + '%';
+        
+        const pDiv = document.getElementById('p-res');
+        pDiv.innerText = `Probabilidad p: ${p.toFixed(4)}`;
+        
+        if(p < 0.05) {
+            pDiv.className = 'p-box sig';
+            pDiv.innerText += " - ¡ANOMALÍA DETECTADA!";
+        } else {
+            pDiv.className = 'p-box';
+        }
+
+        save(hits, p);
+    }
+
+    function calculateP(h, n) {
+        const mu = n * 0.5;
+        const sd = Math.sqrt(n * 0.5 * 0.5);
+        const z = Math.abs(h - mu) / sd;
+        return 2 * (1 - normalCDF(z)); 
+    }
+
+    function normalCDF(z) {
+        const t = 1 / (1 + 0.2316419 * z);
+        const d = 0.3989423 * Math.exp(-z * z / 2);
+        const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+        return 1 - p;
+    }
+
+    function save(h, p) {
+        sessions.unshift({ date: new Date().toLocaleTimeString(), h, p: p.toFixed(4) });
+        sessions = sessions.slice(0, 8);
+        localStorage.setItem('noetic_sessions', JSON.stringify(sessions));
+        render();
+    }
+
+    function render() {
+        document.getElementById('history').innerHTML = sessions.map(s => `
+            <div class="h-item">
+                <span>${s.date}</span>
+                <span>Hits: ${s.h}</span>
+                <span style="color:${s.p < 0.05 ? '#4ecca3' : '#777'}">p: ${s.p}</span>
+            </div>
+        `).join('');
+    }
+
+    // Funciones del Modal
+    function openModal() { document.getElementById('infoModal').style.display = "block"; }
+    function closeModal() { document.getElementById('infoModal').style.display = "none"; }
+    
+    window.onclick = function(event) {
+        let modal = document.getElementById('infoModal');
+        if (event.target == modal) modal.style.display = "none";
+    }
+
+    window.onload = render;
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Noetic Mind Exp",
+  "short_name": "NoeticREG",
+  "description": "Influencia mente-materia basada en experimentos del IONS.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#4ecca3",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
