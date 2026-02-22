@@ -15,30 +15,34 @@
         h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.4rem; margin-top: 20px; letter-spacing: 3px; }
         
         /* Instrucciones Neutrales */
-        .instruction-box { padding: 20px; color: #aaa; font-size: 0.9rem; line-height: 1.6; }
+        .instruction-box { padding: 20px; color: #aaa; font-size: 0.9rem; line-height: 1.6; border-bottom: 1px solid #222; margin-bottom: 10px; }
         .instruction-box b { color: #fff; }
 
-        /* Gráfica de Tendencia Principal */
-        .graph-container { background: #0a0a0a; height: 60px; border-radius: 30px; overflow: hidden; margin: 30px 0; border: 1px solid #333; position: relative; box-shadow: 0 0 20px rgba(0,0,0,1); }
+        /* Gráfica de Tendencia */
+        .graph-container { background: #0a0a0a; height: 60px; border-radius: 30px; overflow: hidden; margin: 30px 0; border: 1px solid #333; position: relative; }
         #bar-0 { background: #222; height: 100%; width: 50%; float: left; transition: width 0.3s ease; }
         #bar-1 { background: var(--primary); height: 100%; width: 50%; float: right; transition: width 0.3s ease; }
         .graph-mid { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: rgba(255,255,255,0.5); z-index: 5; }
 
-        /* Pantalla de Resultados (Oculta durante el proceso) */
-        #results-panel { display: none; background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #222; margin-top: 20px; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
+        /* Resultados */
+        #results-panel { display: none; background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #222; margin-top: 20px; }
         .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
         .p-value-display { margin-top: 20px; padding: 15px; border-radius: 10px; background: #000; border: 1px dashed #444; }
-        .p-number { display: block; font-family: 'Orbitron'; font-size: 1.8rem; margin: 10px 0; }
+        .p-number { display: block; font-family: 'Orbitron'; font-size: 1.6rem; margin: 10px 0; }
 
-        /* Letrero de Anomalía */
-        .anomaly-alert { display: none; background: var(--primary); color: #000; padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; margin-top: 15px; text-transform: uppercase; }
+        /* Anomalía */
+        .anomaly-alert { display: none; background: var(--primary); color: #000; padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; margin-top: 15px; }
 
-        /* Controles */
-        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 50px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 20px; }
+        /* Botones */
+        .btn { background: #fff; color: #000; border: none; padding: 18px; border-radius: 50px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 15px; }
+        .btn-info { background: #16213e; color: var(--primary); border: 1px solid var(--primary); margin-top: 10px; font-size: 0.8rem; }
         .btn-stop { background: var(--accent); color: #fff; display: none; }
         .timer { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--primary); margin: 10px 0; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
+        .modal-content { background: #16213e; margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; text-align: left; border: 1px solid var(--primary); }
+        .close-btn { color: var(--accent); float: right; font-size: 28px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -46,12 +50,9 @@
 <div class="container">
     <h1>NOETIC REG</h1>
     
-    <div id="setup-view">
-        <div class="instruction-box">
-            El sistema emite aleatoriamente <b>unos</b> y <b>ceros</b>. <br><br>
-            Tu tarea es concentrarte para que uno de ellos prevalezca sobre el otro. 
-            Observa la barra de tendencia y mantén tu intención firme.
-        </div>
+    <div class="instruction-box">
+        El sistema emite aleatoriamente <b>unos</b> y <b>ceros</b>. 
+        Concéntrate para que uno prevalezca. Mantén tu intención firme.
     </div>
 
     <div class="timer" id="timer-display">00s</div>
@@ -64,18 +65,33 @@
 
     <button id="btn-start" class="btn" onclick="startExperiment()">INICIAR INFLUENCIA</button>
     <button id="btn-stop" class="btn btn-stop" onclick="stopExperiment()">DETENER</button>
+    <button class="btn btn-info" onclick="openModal()">SABER MÁS / IONS</button>
 
     <div id="results-panel">
-        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary);">RESULTADOS DE LA SESIÓN</h2>
-        <div class="stat-row"><span>Total bits emitidos:</span> <span id="res-total">0</span></div>
-        <div class="stat-row"><span>Distribución Ceros (0):</span> <span id="res-0">0</span></div>
-        <div class="stat-row"><span>Distribución Unos (1):</span> <span id="res-1">0</span></div>
+        <h2 style="font-family: Orbitron; font-size: 1rem; color: var(--primary);">SESIÓN FINALIZADA</h2>
+        <div class="stat-row"><span>Bits totales:</span> <span id="res-total">0</span></div>
+        <div class="stat-row"><span>Ceros (0):</span> <span id="res-0">0</span></div>
+        <div class="stat-row"><span>Unos (1):</span> <span id="res-1">0</span></div>
         
         <div class="p-value-display">
             <span style="font-size: 0.8rem; color: #888;">Probabilidad de que este resultado sea debido al azar:</span>
-            <span id="p-val" class="p-number">0.5000</span>
+            <span id="p-val" class="p-number">--</span>
             <div id="anomaly-tag" class="anomaly-alert">¡ANOMALÍA DETECTADA!</div>
         </div>
+    </div>
+</div>
+
+<div id="infoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 style="font-family: Orbitron; color: var(--primary); margin-bottom: 15px;">Estudios Noéticos</h2>
+        <p style="font-size: 0.9rem; line-height: 1.6; color: #ccc;">
+            El <b>Global Consciousness Project</b> y el <b>IONS</b> (Institute of Noetic Sciences) utilizan Generadores de Eventos Aleatorios (REG) para investigar la interacción entre la conciencia y el mundo físico.
+            <br><br>
+            <b>Protocolo:</b> La "Ley de los Grandes Números" dicta que en un sistema binario equilibrado, los resultados tienden al 50%. Desviaciones estadísticamente significativas (p < 0.05) sugieren que la intención humana puede actuar reduciendo la entropía del sistema.
+            <br><br>
+            <i style="font-size: 0.75rem; color: #777;">Aviso: Esta app es una herramienta de experimentación personal inspirada en estos protocolos. No existe vínculo oficial con el IONS.</i>
+        </p>
     </div>
 </div>
 
@@ -83,34 +99,26 @@
     let n0 = 0, n1 = 0, total = 0, startTime, timerInt, engineInt;
 
     function startExperiment() {
-        // Reset
         n0 = 0; n1 = 0; total = 0;
         document.getElementById('results-panel').style.display = "none";
         document.getElementById('anomaly-tag').style.display = "none";
-        document.getElementById('setup-view').style.opacity = "0.3";
-        
-        // UI
         document.getElementById('btn-start').style.display = "none";
         document.getElementById('btn-stop').style.display = "block";
 
         startTime = Date.now();
-        
         timerInt = setInterval(() => {
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
             document.getElementById('timer-display').innerText = (elapsed < 10 ? '0' : '') + elapsed + "s";
             if(elapsed >= 60) stopExperiment(); 
         }, 1000);
 
-        // Emisor de bits constante
         engineInt = setInterval(() => {
             for(let i=0; i<100; i++) {
                 if(Math.random() > 0.5) n1++; else n0++;
                 total++;
             }
-            // Actualizar gráfica en vivo (pero no los números)
             let p1 = (n1 / total * 100);
-            let p0 = 100 - p1;
-            document.getElementById('bar-0').style.width = p0 + "%";
+            document.getElementById('bar-0').style.width = (100 - p1) + "%";
             document.getElementById('bar-1').style.width = p1 + "%";
         }, 100);
     }
@@ -118,27 +126,26 @@
     function stopExperiment() {
         clearInterval(timerInt);
         clearInterval(engineInt);
-
         document.getElementById('btn-start').style.display = "block";
         document.getElementById('btn-stop').style.display = "none";
-        document.getElementById('setup-view').style.opacity = "1";
 
-        // Mostrar resultados numéricos solo al final
         document.getElementById('res-total').innerText = total;
         document.getElementById('res-0').innerText = n0;
         document.getElementById('res-1').innerText = n1;
 
         const p = calculateP(n1, total);
         const pDisplay = document.getElementById('p-val');
-        pDisplay.innerText = p.toFixed(6);
+        
+        // CORRECCIÓN: Asegurar que p no exceda 1
+        const finalP = p > 1 ? 1 : p;
+        pDisplay.innerText = finalP.toFixed(6);
 
-        if(p < 0.05) {
+        if(finalP < 0.05) {
             document.getElementById('anomaly-tag').style.display = "block";
             pDisplay.style.color = "var(--primary)";
         } else {
             pDisplay.style.color = "#fff";
         }
-
         document.getElementById('results-panel').style.display = "block";
     }
 
@@ -147,14 +154,21 @@
         const mu = n * 0.5;
         const sd = Math.sqrt(n * 0.5 * 0.5);
         const z = Math.abs(hits - mu) / sd;
-        return 2 * (1 - errorFunc(z / Math.sqrt(2)));
+        // Fórmula de aproximación para la distribución normal (p-valor de dos colas)
+        const p = 2 * (1 - normalCDF(z));
+        return p;
     }
 
-    function errorFunc(x) {
-        let t = 1.0 / (1.0 + 0.5 * Math.abs(x));
-        let tau = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
-        return x >= 0 ? 1 - tau : tau - 1;
+    function normalCDF(z) {
+        const t = 1 / (1 + 0.2316419 * z);
+        const d = 0.3989423 * Math.exp(-z * z / 2);
+        const prob = 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+        return prob;
     }
+
+    function openModal() { document.getElementById('infoModal').style.display = "block"; }
+    function closeModal() { document.getElementById('infoModal').style.display = "none"; }
+    window.onclick = function(event) { if (event.target == document.getElementById('infoModal')) closeModal(); }
 </script>
 </body>
 </html>
