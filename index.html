@@ -3,160 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noetic REG Pro | Mente-Materia</title>
+    <title>Noetic REG Pro | Visualizador en Vivo</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a2e">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4ecca3; --bg: #1a1a2e; --surface: #16213e; --accent: #e94560; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; }
+        :root { --primary: #4ecca3; --bg: #1a1a2e; --surface: #16213e; --accent: #e94560; --gray: #444; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; padding: 15px; margin: 0; text-align: center; }
         .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
-        .card { background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #0f3460; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        h1, h2 { font-family: 'Orbitron', sans-serif; color: var(--primary); text-align: center; }
-        .display { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; background: #0a1128; padding: 15px; border-radius: 15px; text-align: center; }
-        .val { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; display: block; }
-        .label { font-size: 0.65rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        .btn { background: var(--accent); color: #fff; border: none; padding: 18px; border-radius: 15px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
-        .btn-stop { background: #555; display: none; }
-        .p-box { text-align: center; margin-top: 15px; padding: 12px; border-radius: 10px; font-weight: bold; background: #0a1128; border: 1px dashed #4ecca3; min-height: 50px; }
-        .sig { background: rgba(78, 204, 163, 0.3); border: 2px solid var(--primary); animation: glow 1.5s infinite alternate; }
-        @keyframes glow { from { box-shadow: 0 0 5px var(--primary); } to { box-shadow: 0 0 20px var(--primary); } }
-        .info { font-size: 0.85rem; color: #aaa; line-height: 1.5; margin-bottom: 10px; }
-        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #0f3460; font-size: 0.8rem; }
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
-        .modal-content { background: var(--surface); margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; border: 1px solid var(--primary); }
-        .close-btn { color: var(--accent); float: right; font-size: 24px; cursor: pointer; }
+        .card { background: var(--surface); padding: 20px; border-radius: 20px; border: 1px solid #0f3460; margin-bottom: 20px; }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
+        
+        /* Instrucciones claras */
+        .instruction-box { background: #0a1128; padding: 15px; border-radius: 12px; border: 1px solid var(--primary); margin-bottom: 20px; }
+        .instruction-box b { color: var(--accent); font-size: 1.1rem; }
+
+        /* Gráfica en vivo */
+        .graph-container { background: #000; height: 40px; border-radius: 20px; overflow: hidden; margin: 20px 0; border: 2px solid #333; position: relative; }
+        #bar-0 { background: #333; height: 100%; width: 50%; float: left; transition: width 0.1s linear; }
+        #bar-1 { background: var(--primary); height: 100%; width: 50%; float: right; transition: width 0.1s linear; }
+        .graph-mid { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: #fff; z-index: 5; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #0a1128; padding: 10px; border-radius: 10px; border: 1px solid #1a2a4a; }
+        .stat-val { font-family: 'Orbitron'; font-size: 1.4rem; color: #fff; display: block; }
+        .stat-label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; }
+
+        .btn { background: var(--primary); color: #1a1a2e; border: none; padding: 18px; border-radius: 15px; width: 100%; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
+        .btn-stop { background: var(--accent); color: #fff; display: none; }
+        
+        #p-res { min-height: 40px; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; font-size: 0.9rem; }
+        .sig { background: rgba(78, 204, 163, 0.2); border: 1px solid var(--primary); color: var(--primary); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header style="margin-bottom: 20px; text-align: center;">
-        <h1>NOETIC REG PRO</h1>
-        <p style="font-size:0.7rem; color:var(--primary); letter-spacing:2px;">MICRO-PSICOCINESIS ESTADÍSTICA</p>
+    <header>
+        <h1>REG EXPERIMENTER</h1>
+        <p style="font-size: 0.6rem; color: #888; letter-spacing: 2px;">PSICOCINESIS APLICADA</p>
     </header>
 
+    <div class="instruction-box">
+        <p><b>OBJETIVO MENTAL:</b></p>
+        <p style="font-size: 0.9rem; margin-top: 5px;">Concéntrate intensamente en que el emisor genere más <b>"UNOS" (Barra Verde)</b> o más <b>"CEROS" (Barra Gris)</b>.</p>
+    </div>
+
     <div class="card">
-        <h2>Fase de Influencia</h2>
-        <p class="info">Elige un objetivo: <b>"Unos" (Aciertos)</b> o <b>"Ceros" (Fallos)</b>. Mantén esa intención clara mientras el contador corre.</p>
-        
-        <div class="display">
-            <div><span class="label">Aciertos (1s)</span><span id="hits" class="val">0</span></div>
-            <div><span class="label">Tiradas (n)</span><span id="total" class="val">0</span></div>
-            <div><span class="label">Desviación</span><span id="dev" class="val">0%</span></div>
-            <div><span class="label">Tiempo</span><span id="timer">0s</span></div>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-label">Ceros (0s)</span><span id="c-0" class="stat-val">0</span></div>
+            <div class="stat-card"><span class="stat-label">Unos (1s)</span><span id="c-1" class="stat-val">0</span></div>
+            <div class="stat-card"><span class="stat-label">Total Bits (n)</span><span id="c-total" class="stat-val">0</span></div>
+            <div class="stat-card"><span class="stat-label">Cronómetro</span><span id="c-time" class="stat-val">0s</span></div>
         </div>
 
-        <button id="start-btn" class="btn" onclick="startExp()">INICIAR INFLUENCIA</button>
-        <button id="stop-btn" class="btn btn-stop" onclick="stopExp()">DETENER Y ANALIZAR</button>
-        
-        <div id="p-res" class="p-box">Esperando datos...</div>
-        <button class="btn" style="background:#0f3460; font-size:0.7rem; margin-top:15px;" onclick="openModal()">Ciencia Detrás del Experimento</button>
+        <div class="graph-container">
+            <div class="graph-mid"></div>
+            <div id="bar-0"></div>
+            <div id="bar-1"></div>
+        </div>
+
+        <button id="btn-start" class="btn" onclick="startEngine()">INICIAR EMISIÓN</button>
+        <button id="btn-stop" class="btn btn-stop" onclick="stopEngine()">DETENER INFLUENCIA</button>
+
+        <div id="p-res">Esperando inicio...</div>
     </div>
 
-    <div class="card">
-        <h3>Historial de Anomalías</h3>
-        <div id="history"></div>
-    </div>
-</div>
-
-<div id="infoModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2>Fundamentos Científicos</h2>
-        <p class="info"><b>1. Distribución Binomial:</b> Cada bit es un evento de Bernoulli (50/50). Al acumular miles de bits, calculamos la probabilidad exacta de que tu desviación sea fruto del azar.</p>
-        <p class="info"><b>2. Ley de los Grandes Números:</b> A mayor número de tiradas, el promedio tiende a estabilizarse en el 50%. Si logras mantener una desviación significativa (p < 0.05) con miles de tiradas, la probabilidad de influencia mental es muy alta.</p>
-        <p class="info"><b>3. Efecto Noético:</b> Basado en estudios del IONS, sugerimos que la intención humana puede actuar como un "campo de información" que reduce la entropía del sistema aleatorio.</p>
-    </div>
+    <p style="font-size: 0.7rem; color: #555; padding: 10px;">Basado en la Ley de los Grandes Números y la Distribución Binomial. La influencia se mide por la desviación del 50% teórico.</p>
 </div>
 
 <script>
-    let hits = 0, total = 0, seconds = 0, interval, timerInterval;
-    let sessions = JSON.parse(localStorage.getItem('noetic_pro_sessions') || '[]');
+    let n0 = 0, n1 = 0, nTotal = 0, startTime, timerInterval, engineInterval;
 
-    function startExp() {
-        hits = 0; total = 0; seconds = 0;
-        document.getElementById('start-btn').style.display = 'none';
-        document.getElementById('stop-btn').style.display = 'block';
-        document.getElementById('p-res').innerText = "Generando flujo de bits...";
+    function startEngine() {
+        // Reset
+        n0 = 0; n1 = 0; nTotal = 0;
+        document.getElementById('c-0').innerText = "0";
+        document.getElementById('c-1').innerText = "0";
+        document.getElementById('c-total').innerText = "0";
+        document.getElementById('c-time').innerText = "0s";
+        document.getElementById('p-res').innerText = "Influencia en curso...";
+        document.getElementById('p-res').className = "";
+
+        // UI
+        document.getElementById('btn-start').style.display = "none";
+        document.getElementById('btn-stop').style.display = "block";
+
+        startTime = Date.now();
         
-        // Generar 100 bits cada 200ms para que sea fluido
-        interval = setInterval(() => {
-            for(let i=0; i<50; i++) {
-                if(Math.random() > 0.5) hits++;
-                total++;
-            }
-            updateUI();
-        }, 100);
-
+        // Cronómetro
         timerInterval = setInterval(() => {
-            seconds++;
-            document.getElementById('timer').innerText = seconds + 's';
-            if(seconds >= 60) stopExp(); // Auto-stop a los 60s
+            let elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('c-time').innerText = elapsed + "s";
+            if(elapsed >= 60) stopEngine(); // Auto-parada por fatiga mental
         }, 1000);
+
+        // Emisor de Bits (Genera 100 bits cada 100ms para ver fluidez)
+        engineInterval = setInterval(() => {
+            for(let i=0; i<50; i++) {
+                if(Math.random() > 0.5) n1++; else n0++;
+                nTotal++;
+            }
+            updateView();
+        }, 100);
     }
 
-    function stopExp() {
-        clearInterval(interval);
+    function updateView() {
+        document.getElementById('c-0').innerText = n0;
+        document.getElementById('c-1').innerText = n1;
+        document.getElementById('c-total').innerText = nTotal;
+        
+        let p0 = (n0 / nTotal * 100).toFixed(1);
+        let p1 = (n1 / nTotal * 100).toFixed(1);
+        
+        document.getElementById('bar-0').style.width = p0 + "%";
+        document.getElementById('bar-1').style.width = p1 + "%";
+    }
+
+    function stopEngine() {
         clearInterval(timerInterval);
-        document.getElementById('start-btn').style.display = 'block';
-        document.getElementById('stop-btn').style.display = 'none';
+        clearInterval(engineInterval);
+
+        document.getElementById('btn-start').style.display = "block";
+        document.getElementById('btn-stop').style.display = "none";
+
+        const pValue = calculateP(n1, nTotal);
+        const resultBox = document.getElementById('p-res');
         
-        const p = calculateP(hits, total);
-        const pDiv = document.getElementById('p-res');
-        pDiv.innerText = `Resultado Final - p: ${p.toFixed(5)}`;
-        
-        if(p < 0.05) {
-            pDiv.className = 'p-box sig';
-            pDiv.innerText += " (SIGNIFICATIVO)";
+        let text = `Probabilidad azar (p): ${pValue.toFixed(4)}`;
+        if(pValue < 0.05) {
+            resultBox.className = "sig";
+            text += " - ¡ANOMALÍA DETECTADA!";
         } else {
-            pDiv.className = 'p-box';
+            resultBox.className = "";
+            text += " - Resultado dentro del azar.";
         }
-        save(hits, total, p);
+        resultBox.innerText = text;
     }
 
-    function updateUI() {
-        document.getElementById('hits').innerText = hits;
-        document.getElementById('total').innerText = total;
-        const dev = ((hits - (total/2)) / (total/2) * 100).toFixed(1);
-        document.getElementById('dev').innerText = (dev > 0 ? '+'+dev : dev) + '%';
+    // Estadística: Distribución Binomial aproximada por Z-Score
+    function calculateP(hits, n) {
+        if (n < 10) return 1;
+        let expected = n * 0.5;
+        let sd = Math.sqrt(n * 0.5 * 0.5);
+        let z = Math.abs(hits - expected) / sd;
+        return 2 * (1 - errorFunction(z / Math.sqrt(2)));
     }
 
-    function calculateP(h, n) {
-        if (n === 0) return 1;
-        const mu = n * 0.5;
-        const sd = Math.sqrt(n * 0.5 * 0.5);
-        const z = Math.abs(h - mu) / sd;
-        return 2 * (1 - normalCDF(z));
+    function errorFunction(x) {
+        let t = 1.0 / (1.0 + 0.5 * Math.abs(x));
+        let tau = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+        return x >= 0 ? 1 - tau : tau - 1;
     }
-
-    function normalCDF(z) {
-        const t = 1 / (1 + 0.2316419 * z);
-        const d = 0.3989423 * Math.exp(-z * z / 2);
-        return 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
-    }
-
-    function save(h, n, p) {
-        sessions.unshift({ date: new Date().toLocaleTimeString(), h, n, p: p.toFixed(4) });
-        sessions = sessions.slice(0, 5);
-        localStorage.setItem('noetic_pro_sessions', JSON.stringify(sessions));
-        render();
-    }
-
-    function render() {
-        document.getElementById('history').innerHTML = sessions.map(s => `
-            <div class="history-item">
-                <span>${s.date}</span>
-                <span>n=${s.n} | H=${s.h}</span>
-                <span style="color:${s.p < 0.05 ? '#4ecca3' : '#777'}">p=${s.p}</span>
-            </div>
-        `).join('');
-    }
-
-    function openModal() { document.getElementById('infoModal').style.display = "block"; }
-    function closeModal() { document.getElementById('infoModal').style.display = "none"; }
-    window.onload = render;
 </script>
 </body>
 </html>
